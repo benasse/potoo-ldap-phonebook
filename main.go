@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -14,9 +15,28 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var (
+	ldap_user     string
+	ldap_password string
+)
+
 var DB *sql.DB
 
 func main() {
+
+	var (
+		lu string
+		lp string
+	)
+
+	// parse arguments
+	flag.StringVar(&lu, "lu", "", "ldap user allowed to do binding request")
+	flag.StringVar(&lp, "lp", "", "ldap password allowed to do binding request")
+	flag.Parse()
+
+	ldap_user = lu
+	ldap_password = lp
+
 	// turn on debug logging
 	l := hclog.New(&hclog.LoggerOptions{
 		Name:  "potoo-ldap-phonebook",
@@ -79,7 +99,7 @@ func bindHandler(authenticatedConnections map[int]struct{}) func(*gldap.Response
 			log.Printf("not a simple bind message: %s", err)
 			return
 		}
-		if m.UserName == "uid=potoo" && m.Password == "authpass" {
+		if m.UserName == ldap_user && string(m.Password) == ldap_password {
 			authenticatedConnections[r.ConnectionID()] = struct{}{} // mark connection as authenticated
 			resp.SetResultCode(gldap.ResultSuccess)
 			log.Println("bind success")
@@ -117,14 +137,14 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 			reCn := regexp.MustCompile(`cn=(\*[a-zA-Z0-9_-]*\*|[a-zA-Z0-9_-]*\*|[a-zA-Z0-9_-]*)`)
 
 			query := `
-                     SELECT DISTINCT
-                       CONCAT('user-', userfeatures.uuid, '-', linefeatures.number) AS uid,
-                       CONCAT(userfeatures.firstname, ' ',userfeatures.lastname) AS cn,
-                       COALESCE(linefeatures.number, '') AS telephoneNumber
-                       FROM
-                       public.userfeatures
-                       LEFT JOIN user_line ON (user_line.user_id = userfeatures.id)
-                       LEFT JOIN linefeatures ON (user_line.line_id = linefeatures.id)
+                        SELECT DISTINCT
+                        CONCAT('user-', userfeatures.uuid, '-', linefeatures.number) AS uid,
+                        CONCAT(userfeatures.firstname, ' ',userfeatures.lastname) AS cn,
+                        COALESCE(linefeatures.number, '') AS telephoneNumber
+                        FROM
+                        public.userfeatures
+                        LEFT JOIN user_line ON (user_line.user_id = userfeatures.id)
+                        LEFT JOIN linefeatures ON (user_line.line_id = linefeatures.id)
                         `
 
 			phonePatern := rePhone.FindSubmatch([]byte(m.Filter))
@@ -151,13 +171,13 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 			}
 
 			query += `UNION ALL
-                      SELECT
+                        SELECT
                         CONCAT('usermobile-', userfeatures.uuid,'-', userfeatures.mobilephonenumber) AS uid,
                         CONCAT(userfeatures.firstname, ' ',userfeatures.lastname,' (Mobile)') AS cn,
                         COALESCE(userfeatures.mobilephonenumber, '') AS telephoneNumber
                         FROM
                         public.userfeatures
-                      `
+                        `
 
 			if phonePatern != nil && cnPatern != nil {
 				query += "WHERE userfeatures.mobilephonenumber LIKE '"
@@ -180,7 +200,7 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 			}
 			query += ""
 			query += `UNION ALL
-                      SELECT
+                        SELECT
                         CONCAT('group-', groupfeatures.uuid,'-', extensions.exten) AS uid,
                         groupfeatures.label AS cn,
                         extensions.exten AS telephoneNumber
@@ -206,7 +226,7 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 
 			query += ""
 			query += `UNION ALL
-                      SELECT
+                        SELECT
                         CONCAT('queue-', queuefeatures.id,'-', extensions.exten) AS uid,
                         queuefeatures.displayname AS cn,
                         extensions.exten AS telephoneNumber

@@ -1,0 +1,13 @@
+[Unit]
+Description=potoo LDAP phonebook
+
+[Service]
+PIDFile=/var/run/potoo-ldap-phonebook.pid
+User=asterisk
+Group=asterisk
+WorkingDirectory=/usr/local/bin
+ExecStart=/bin/bash -c '/usr/local/bin/potoo-ldap-phonebook -lu uid=potoo -lp AeG5ahy4'
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
