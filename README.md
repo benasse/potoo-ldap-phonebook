@@ -3,7 +3,7 @@ Expose wazo directory throught ldap
 
 ## Installation
 ```
-wazo-plugind-cli -c 'install git https://github.com/benasse/potoo'
+wazo-plugind-cli -c 'install git https://github.com/benasse/potoo-ldap-phonebook'
 ```
 
 ## Usage
