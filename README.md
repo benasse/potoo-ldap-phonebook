@@ -29,3 +29,6 @@ ldapsearch -x -b "ou=phonebook,cn=potoo,dc=pm" -H ldap://localhost:10389 -D uid=
 
 ## Limitaiton
 Only simple ldap filters are supported
+
+## Other
+Inspired by https://github.com/a1comms/freepbx-ldap
