@@ -215,7 +215,7 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 				query += strings.ReplaceAll(string(cnPatern[1]), "*", "%")
 				query += "' "
 			} else if phonePatern != nil {
-				query += "AND extension.exten LIKE '"
+				query += "AND extensions.exten LIKE '"
 				query += strings.ReplaceAll(string(phonePatern[1]), "*", "%")
 				query += "' "
 			} else if cnPatern != nil {
@@ -241,7 +241,7 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 				query += strings.ReplaceAll(string(cnPatern[1]), "*", "%")
 				query += "' "
 			} else if phonePatern != nil {
-				query += "AND extension.exten LIKE '"
+				query += "AND extensions.exten LIKE '"
 				query += strings.ReplaceAll(string(phonePatern[1]), "*", "%")
 				query += "' "
 			} else if cnPatern != nil {
@@ -250,7 +250,7 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 				query += "' "
 			}
 
-			query += "ORDER BY cn LIMIT 100;"
+			query += "ORDER BY cn LIMIT 20;"
 
 			//log.Println(query)
 
