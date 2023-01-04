@@ -211,7 +211,7 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 			if phonePatern != nil && cnPatern != nil {
 				query += "AND extensions.exten LIKE '"
 				query += strings.ReplaceAll(string(phonePatern[1]), "*", "%")
-				query += "' OR groupefeatures.label LIKE '"
+				query += "' OR groupfeatures.label LIKE '"
 				query += strings.ReplaceAll(string(cnPatern[1]), "*", "%")
 				query += "' "
 			} else if phonePatern != nil {
@@ -250,7 +250,7 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 				query += "' "
 			}
 
-			query += "ORDER BY cn LIMIT 20;"
+			query += "ORDER BY cn LIMIT 50;"
 
 			//log.Println(query)
 
