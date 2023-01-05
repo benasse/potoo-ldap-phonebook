@@ -8,13 +8,18 @@ case "$1" in
 
     package)
 	mkdir -p ${pkgdir}/etc/systemd/system
-	cp -R potoo-ldap-phonebook.service ${pkgdir}/etc/systemd/system 
+	cp -R potoo-ldap-phonebook.service ${pkgdir}/etc/systemd/system/potoo-ldap-phonebook.service.sample 
+	openssl rand -base64 14  | { read val; sed -i "s/AeG5ahy4/$val/g" /etc/systemd/system/potoo-ldap-phonebook.service; }
 	mkdir -p ${pkgdir}/usr/local/bin
 	wget -c https://github.com/benasse/potoo-ldap-phonebook/releases/download/v1.0.2/potoo-ldap-phonebook-v1.0.2-linux-amd64.tar.gz -O - | tar -xz -C ${pkgdir}/usr/local/bin/
         ;;
 
     install)
-	openssl rand -base64 14  | { read val; sed -i "s/AeG5ahy4/$val/g" /etc/systemd/system/potoo-ldap-phonebook.service; }
+	if [ ! -f /etc/systemd/system/potoo-ldap-phonebook.service ]
+        then
+         mv /etc/systemd/system/potoo-ldap-phonebook.service.sample /etc/systemd/system/potoo-ldap-phonebook.service
+        fi
+	systemctl daemon-reload
 	systemctl enable potoo-ldap-phonebook
 	systemctl start potoo-ldap-phonebook
         ;;

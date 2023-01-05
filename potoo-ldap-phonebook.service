@@ -2,7 +2,7 @@
 Description=potoo LDAP phonebook
 
 [Service]
-PIDFile=/var/run/potoo-ldap-phonebook.pid
+PIDFile=/run/potoo-ldap-phonebook.pid
 User=asterisk
 Group=asterisk
 WorkingDirectory=/usr/local/bin
