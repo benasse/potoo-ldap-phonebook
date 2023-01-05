@@ -18,6 +18,8 @@ case "$1" in
 	if [ ! -f /etc/systemd/system/potoo-ldap-phonebook.service ]
         then
          mv /etc/systemd/system/potoo-ldap-phonebook.service.sample /etc/systemd/system/potoo-ldap-phonebook.service
+	else
+	  rm /etc/systemd/system/potoo-ldap-phonebook.service.sample
         fi
 	systemctl daemon-reload
 	systemctl enable potoo-ldap-phonebook
