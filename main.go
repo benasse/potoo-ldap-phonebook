@@ -127,6 +127,14 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 		}
 		log.Printf("search base dn: %s", m.BaseDN)
 		log.Printf("search scope: %d", m.Scope)
+
+                // TODO: do something cleaner to fix encoding encoding problem
+		m.Filter = strings.Replace(m.Filter, `\c3\a7`, "ç", -1)
+		m.Filter = strings.Replace(m.Filter, `\c3\a8`, "è", -1)
+		m.Filter = strings.Replace(m.Filter, `\c3\a9`, "é", -1)
+		m.Filter = strings.Replace(m.Filter, `\c3\ae`, "î", -1)
+		m.Filter = strings.Replace(m.Filter, `\c3\af`, "ï", -1)
+
 		log.Printf("search filter: %s", m.Filter)
 
 		if m.BaseDN == "ou=phonebook,cn=potoo,dc=pm" {
@@ -134,7 +142,7 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 			// TODO: make something better to parse filter may be with https://github.com/janstuemmel/go-ldap-filter
 			// or https://github.com/alecthomas/participle
 			rePhone := regexp.MustCompile(`telephoneNumber=(\*\d*\*|\d*[*]{1}|\d*)`)
-			reCn := regexp.MustCompile(`cn=(\*[a-zA-Z0-9_-]*\*|[a-zA-Z0-9_-]*\*|[a-zA-Z0-9_-]*)`)
+			reCn := regexp.MustCompile(`cn=(\*[a-zA-Z0-9_-çèéîï]*\*|[a-zA-Z0-9_-çèéîï]*\*|[a-zA-Z0-9_-çèéîï]*)`)
 
 			query := `
                         SELECT DISTINCT
