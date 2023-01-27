@@ -258,7 +258,7 @@ func searchHandler(authenticatedConnections map[int]struct{}) func(w *gldap.Resp
 				query += "' "
 			}
 
-			query += "ORDER BY cn LIMIT 50;"
+			query += "ORDER BY cn LIMIT 10;"
 
 			//log.Println(query)
 
